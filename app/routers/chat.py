@@ -42,6 +42,8 @@ async def chat(
             return await handle_rollback(intent, logic_service)
         elif action == "list_longest":
             return await handle_list_longest(intent, logic_service)
+        elif action == "list_cards":
+            return await handle_list_cards(intent, logic_service)
         elif action == "list_decks":
             return await handle_list_decks(intent, logic_service)
         else:
@@ -202,6 +204,55 @@ async def handle_list_longest(
     )
 
 
+async def handle_list_cards(
+    intent: Dict[str, Any], 
+    logic_service: LogicService
+) -> ChatResponse:
+    """Handle list cards action."""
+    deck = intent["deck"]
+    field = intent["field"]
+    limit = intent["limit"]
+    filter_description = intent.get("filter_description", "")
+    position = intent.get("position", "top")
+    
+    list_response = await logic_service.list_cards(deck, field, filter_description, limit, position)
+    
+    if list_response.total_found == 0:
+        return ChatResponse(
+            message=f"No cards found in deck '{deck}'",
+            action="list_cards",
+            data={"total_found": 0},
+            needs_confirmation=False
+        )
+    
+    # Format the list
+    items_text = format_cards_list(list_response.items)
+    
+    # Customize message based on whether filtering was applied
+    if filter_description:
+        message = (
+            f"Found {list_response.total_found} cards in deck '{deck}' matching '{filter_description}'. "
+            f"Top {len(list_response.items)}:\n\n{items_text}"
+        )
+    else:
+        position_text = position.capitalize()
+        message = (
+            f"Found {list_response.total_found} cards in deck '{deck}'. "
+            f"{position_text} {len(list_response.items)} (natural deck order):\n\n{items_text}"
+        )
+    
+    # Add deck resolution information if applicable
+    if list_response.deck_resolved:
+        message = f"Note: Resolved deck name '{list_response.deck_resolved}' to '{deck}'\n\n" + message
+    
+    return ChatResponse(
+        message=message,
+        action="list_cards",
+        data=list_response.dict(),
+        needs_confirmation=False
+    )
+
+
 async def handle_list_decks(
     intent: Dict[str, Any], 
     logic_service: LogicService
@@ -256,6 +307,23 @@ def format_longest_list(items) -> str:
     for i, item in enumerate(items, 1):
         lines.append(f"{i}. Note {item.note_id} ({item.length} words):")
         lines.append(f"   {item.example[:100]}{'...' if len(item.example) > 100 else ''}")
+        lines.append("")
+    
+    return "\n".join(lines)
+
+
+def format_cards_list(cards) -> str:
+    """Format cards list for display."""
+    if not cards:
+        return "No cards to show"
+    
+    lines = []
+    for i, card in enumerate(cards, 1):
+        score_text = f"Score: {card.score:.2f}"
+        lines.append(f"{i}. Note {card.note_id} ({score_text}):")
+        lines.append(f"   {card.example[:100]}{'...' if len(card.example) > 100 else ''}")
+        if card.reasoning:
+            lines.append(f"   Reason: {card.reasoning}")
         lines.append("")
     
     return "\n".join(lines)
