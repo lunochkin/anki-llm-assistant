@@ -122,7 +122,6 @@ async def cli_main():
         print("Commands:")
         print("  compact <deck> [field] [preview_count] [limit]")
         print("  rollback <deck> [field]")
-        print("  list-longest <deck> [field] [limit]")
         print("  list-decks")
         return
     
@@ -180,30 +179,6 @@ async def cli_main():
             else:
                 print(f"Successfully restored {result.restored} examples.")
         
-        elif command == "list-longest":
-            if len(sys.argv) < 3:
-                print("Usage: list-longest <deck> [field] [limit]")
-                return
-            
-            deck = sys.argv[2]
-            field = sys.argv[3] if len(sys.argv) > 3 else "Example"
-            limit = int(sys.argv[4]) if len(sys.argv) > 4 else 10
-            
-            from app.services.logic import LogicService
-            logic_service = LogicService()
-            
-            print(f"Listing longest examples in deck '{deck}'...")
-            result = await logic_service.list_longest_examples(deck, field, limit)
-            
-            if result.total_found == 0:
-                print("No examples found.")
-                return
-            
-            print(f"\nTop {len(result.items)} longest examples:")
-            for i, item in enumerate(result.items, 1):
-                print(f"\n{i}. Note {item.note_id} ({item.length} words):")
-                print(f"   {item.example}")
-        
         elif command == "list-decks":
             from app.services.logic import LogicService
             logic_service = LogicService()
@@ -222,7 +197,7 @@ async def cli_main():
         
         else:
             print(f"Unknown command: {command}")
-            print("Available commands: compact, rollback, list-longest, list-decks")
+            print("Available commands: compact, rollback, list-decks")
     
     except Exception as e:
         print(f"Error: {e}")

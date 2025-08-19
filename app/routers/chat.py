@@ -40,8 +40,6 @@ async def chat(
             return await handle_compact_examples(request, intent, logic_service)
         elif action == "rollback":
             return await handle_rollback(intent, logic_service)
-        elif action == "list_longest":
-            return await handle_list_longest(intent, logic_service)
         elif action == "list_cards":
             return await handle_list_cards(intent, logic_service)
         elif action == "list_decks":
@@ -170,40 +168,6 @@ async def handle_rollback(
     )
 
 
-async def handle_list_longest(
-    intent: Dict[str, Any], 
-    logic_service: LogicService
-) -> ChatResponse:
-    """Handle list longest examples action."""
-    deck = intent["deck"]
-    field = intent["field"]
-    limit = intent["limit"]
-    
-    list_response = await logic_service.list_longest_examples(deck, field, limit)
-    
-    if list_response.total_found == 0:
-        return ChatResponse(
-            message=f"No examples found in deck '{deck}'",
-            action="list_longest",
-            data={"total_found": 0},
-            needs_confirmation=False
-        )
-    
-    # Format the list
-    items_text = format_longest_list(list_response.items)
-    message = (
-        f"Found {list_response.total_found} examples in deck '{deck}'. "
-        f"Top {len(list_response.items)} longest:\n\n{items_text}"
-    )
-    
-    return ChatResponse(
-        message=message,
-        action="list_longest",
-        data=list_response.dict(),
-        needs_confirmation=False
-    )
-
-
 async def handle_list_cards(
     intent: Dict[str, Any], 
     logic_service: LogicService
@@ -293,20 +257,6 @@ def format_preview_diffs(diffs) -> str:
         lines.append(f"Note {diff.note_id} (word: '{diff.word}'):")
         lines.append(f"  Old: {diff.old}")
         lines.append(f"  New: {diff.new}")
-        lines.append("")
-    
-    return "\n".join(lines)
-
-
-def format_longest_list(items) -> str:
-    """Format longest examples list for display."""
-    if not items:
-        return "No items to show"
-    
-    lines = []
-    for i, item in enumerate(items, 1):
-        lines.append(f"{i}. Note {item.note_id} ({item.length} words):")
-        lines.append(f"   {item.example[:100]}{'...' if len(item.example) > 100 else ''}")
         lines.append("")
     
     return "\n".join(lines)

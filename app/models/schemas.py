@@ -34,19 +34,6 @@ class ApplySummary(BaseModel):
     tagged: int = Field(..., description="Number of notes tagged")
 
 
-class ListLongestItem(BaseModel):
-    """Item in longest examples list."""
-    note_id: int = Field(..., description="Anki note ID")
-    length: int = Field(..., description="Word count of example")
-    example: str = Field(..., description="Example sentence excerpt")
-
-
-class ListLongestResponse(BaseModel):
-    """Response for longest examples list."""
-    items: List[ListLongestItem] = Field(..., description="List of longest examples")
-    total_found: int = Field(..., description="Total notes found")
-
-
 class RollbackResponse(BaseModel):
     """Response for rollback operation."""
     restored: int = Field(..., description="Number of notes restored")
@@ -82,13 +69,6 @@ class RollbackRequest(BaseModel):
     """Rollback request."""
     deck: str = Field(..., description="Deck name")
     field: str = Field("Example", description="Field to rollback")
-
-
-class ListLongestRequest(BaseModel):
-    """List longest examples request."""
-    deck: str = Field(..., description="Deck name")
-    field: str = Field("Example", description="Field to analyze")
-    limit: int = Field(10, description="Maximum items to return")
 
 
 class ListCardsRequest(BaseModel):

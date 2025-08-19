@@ -8,7 +8,6 @@ This assistant helps you manage your Anki cards by:
 
 - **Compacting long example sentences** to 10-16 words while preserving target vocabulary
 - **Rolling back changes** to restore original examples
-- **Analyzing your decks** to find the longest examples
 - **Natural language commands** - just chat with it like a human!
 
 ## 🚀 Features
@@ -90,10 +89,6 @@ Compact examples in deck 'News B2', preview 5, apply 30
 Rollback compacted examples in 'News B2'
 ```
 
-```
-List 10 longest examples in 'News B2'
-```
-
 ### CLI Usage
 
 ```bash
@@ -102,9 +97,6 @@ python -m app.main --cli compact "News B2" Example 5 30
 
 # Rollback changes
 python -m app.main --cli rollback "News B2" Example
-
-# List longest examples
-python -m app.main --cli list-longest "News B2" Example 10
 ```
 
 ## 🔧 Configuration
@@ -191,7 +183,6 @@ pytest tests/ --cov=app --cov-report=html
 - `POST /ops/compact/preview` - Preview compaction
 - `POST /ops/compact/apply` - Apply with token
 - `POST /ops/rollback` - Rollback changes
-- `POST /ops/list-longest` - List longest examples
 
 ### Utility
 - `GET /health` - Health check
