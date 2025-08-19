@@ -89,3 +89,28 @@ class ListLongestRequest(BaseModel):
     deck: str = Field(..., description="Deck name")
     field: str = Field("Example", description="Field to analyze")
     limit: int = Field(10, description="Maximum items to return")
+
+
+class ListCardsRequest(BaseModel):
+    """List cards with LLM filtering request."""
+    deck: str = Field(..., description="Deck name")
+    field: str = Field("Example", description="Field to analyze")
+    filter_description: str = Field("", description="Natural language description of what to filter for")
+    limit: int = Field(10, description="Maximum items to return")
+    position: str = Field("top", description="Position in deck: 'top' or 'bottom'")
+
+
+class ListCardsItem(BaseModel):
+    """Item in filtered cards list."""
+    note_id: int = Field(..., description="Anki note ID")
+    score: float = Field(..., description="LLM relevance score (0.0-1.0)")
+    example: str = Field(..., description="Example sentence excerpt")
+    reasoning: str = Field(..., description="LLM reasoning for why this card matches")
+
+
+class ListCardsResponse(BaseModel):
+    """Response for filtered cards list."""
+    items: List[ListCardsItem] = Field(..., description="List of filtered cards")
+    total_found: int = Field(..., description="Total notes found")
+    filter_applied: str = Field(..., description="Description of the filter that was applied")
+    deck_resolved: Optional[str] = Field(None, description="Original deck name if it was resolved to a different name")

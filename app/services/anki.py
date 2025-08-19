@@ -132,6 +132,52 @@ class AnkiConnectClient:
         
         return deck_stats
 
+    async def find_best_matching_deck(self, partial_name: str) -> Optional[str]:
+        """Find the best matching deck name using fuzzy matching."""
+        if not partial_name or not partial_name.strip():
+            return None
+        
+        deck_names = await self.get_deck_names()
+        if not deck_names:
+            return None
+        
+        partial_lower = partial_name.lower().strip()
+        
+        # First try exact match (case-insensitive)
+        for deck_name in deck_names:
+            if deck_name.lower() == partial_lower:
+                return deck_name
+        
+        # Then try contains match
+        for deck_name in deck_names:
+            if partial_lower in deck_name.lower():
+                return deck_name
+        
+        # Then try word boundary matches (e.g., "Cambridge" matches "Cambridge English B2")
+        partial_words = partial_lower.split()
+        for deck_name in deck_names:
+            deck_lower = deck_name.lower()
+            if all(word in deck_lower for word in partial_words):
+                return deck_name
+        
+        # Finally try fuzzy matching with simple similarity
+        best_match = None
+        best_score = 0
+        
+        for deck_name in deck_names:
+            deck_lower = deck_name.lower()
+            
+            # Calculate simple similarity score
+            common_chars = sum(1 for c in partial_lower if c in deck_lower)
+            total_chars = len(partial_lower) + len(deck_lower)
+            if total_chars > 0:
+                similarity = common_chars / total_chars
+                if similarity > best_score and similarity > 0.3:  # Minimum threshold
+                    best_score = similarity
+                    best_match = deck_name
+        
+        return best_match
+
     async def get_model_field_names(self, model_name: str) -> List[str]:
         """Get field names for a note type."""
         result = await self.rpc("modelFieldNames", modelName=model_name)

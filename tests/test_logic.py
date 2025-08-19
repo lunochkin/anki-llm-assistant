@@ -6,7 +6,7 @@ from app.services.logic import LogicService, LogicServiceError
 from app.models.schemas import (
     CompactRequest, CompactPreviewResponse, PreviewDiff,
     ApplySummary, ListLongestResponse, ListLongestItem,
-    RollbackResponse
+    RollbackResponse, ListCardsResponse, ListCardsItem
 )
 
 
@@ -336,6 +336,168 @@ class TestListLongestExamples:
         
         assert result.total_found == 0
         assert result.items == []
+
+
+class TestListCards:
+    """Test list cards functionality."""
+    
+    async def test_list_cards_with_filter(self, logic_service, mock_anki_client, mock_llm_service):
+        """Test list cards with LLM filtering."""
+        # Mock the LLM filtering response
+        mock_llm_service.filter_cards_by_description.return_value = [
+            {
+                "note_id": 1,
+                "score": 0.95,
+                "reasoning": "Perfect match for business vocabulary"
+            },
+            {
+                "note_id": 2,
+                "score": 0.87,
+                "reasoning": "Good match with business context"
+            }
+        ]
+        
+        result = await logic_service.list_cards(
+            deck="Business English",
+            field="Example",
+            filter_description="business vocabulary",
+            limit=5
+        )
+        
+        assert isinstance(result, ListCardsResponse)
+        assert result.total_found == 3  # From mock_anki_client
+        assert len(result.items) == 2
+        assert result.filter_applied == "business vocabulary"
+        
+        # Check first item
+        first_item = result.items[0]
+        assert first_item.note_id == 1
+        assert first_item.score == 0.95
+        assert first_item.reasoning == "Perfect match for business vocabulary"
+        
+        # Verify LLM service was called
+        mock_llm_service.filter_cards_by_description.assert_called_once()
+        call_args = mock_llm_service.filter_cards_by_description.call_args
+        assert call_args[0][0] == "business vocabulary"  # filter_description
+        assert len(call_args[0][1]) == 3  # cards_data
+        assert call_args[0][2] == 5  # limit
+    
+    async def test_list_cards_without_filter(self, logic_service, mock_anki_client, mock_llm_service):
+        """Test list cards without filter (natural deck order)."""
+        result = await logic_service.list_cards(
+            deck="Test Deck",
+            field="Example",
+            filter_description="",
+            limit=3,
+            position="top"
+        )
+        
+        assert isinstance(result, ListCardsResponse)
+        assert result.total_found == 3
+        assert len(result.items) == 3
+        assert result.filter_applied == "No filter applied - natural deck order (top)"
+        
+        # Should be in natural deck order (as returned by Anki) - top cards
+        assert result.items[0].note_id == 1  # First note in natural order
+        assert result.items[1].note_id == 2  # Second note in natural order
+        assert result.items[2].note_id == 3  # Third note in natural order
+        
+        # All cards should have same score when no filtering
+        assert all(item.score == 1.0 for item in result.items)
+        assert all("Natural deck order - top" in item.reasoning for item in result.items)
+        
+        # LLM service should not be called when no filter
+        mock_llm_service.filter_cards_by_description.assert_not_called()
+    
+    async def test_list_cards_bottom_position(self, logic_service, mock_anki_client, mock_llm_service):
+        """Test list cards with bottom position (natural deck order)."""
+        result = await logic_service.list_cards(
+            deck="Test Deck",
+            field="Example",
+            filter_description="",
+            limit=2,
+            position="bottom"
+        )
+        
+        assert isinstance(result, ListCardsResponse)
+        assert result.total_found == 3
+        assert len(result.items) == 2
+        assert result.filter_applied == "No filter applied - natural deck order (bottom)"
+        
+        # Should be in natural deck order (as returned by Anki) - bottom cards
+        assert result.items[0].note_id == 2  # Second to last note in natural order
+        assert result.items[1].note_id == 3  # Last note in natural order
+        
+        # All cards should have same score when no filtering
+        assert all(item.score == 1.0 for item in result.items)
+        assert all("Natural deck order - bottom" in item.reasoning for item in result.items)
+        
+        # LLM service should not be called when no filter
+        mock_llm_service.filter_cards_by_description.assert_not_called()
+    
+    async def test_list_cards_no_notes_found(self, logic_service, mock_anki_client):
+        """Test list cards when no notes are found."""
+        mock_anki_client.find_notes.return_value = []
+        
+        result = await logic_service.list_cards(
+            deck="Empty Deck",
+            field="Example",
+            filter_description="any filter",
+            limit=5
+        )
+        
+        assert isinstance(result, ListCardsResponse)
+        assert result.total_found == 0
+        assert result.items == []
+        assert result.filter_applied == "any filter"
+    
+    async def test_list_cards_field_auto_detection(self, logic_service, mock_anki_client):
+        """Test list cards with field auto-detection."""
+        # Mock no notes found with "Example" field
+        mock_anki_client.find_notes.return_value = []
+        # Mock auto-detection finding "Back" field
+        mock_anki_client.detect_content_field.return_value = "Back"
+        # Mock finding notes with "Back" field
+        mock_anki_client.find_notes.side_effect = [[], [1, 2, 3]]
+        
+        result = await logic_service.list_cards(
+            deck="Test Deck",
+            field="Example",
+            filter_description="",
+            limit=3
+        )
+        
+        assert result.total_found == 3
+        # Should have called detect_content_field
+        mock_anki_client.detect_content_field.assert_called_once_with("Test Deck")
+
+    async def test_list_cards_deck_name_resolution(self, logic_service, mock_anki_client, mock_llm_service):
+        """Test list cards with deck name resolution."""
+        # Mock no notes found initially
+        mock_anki_client.find_notes.return_value = []
+        # Mock available decks
+        mock_anki_client.get_deck_names.return_value = ["Cambridge English B2", "Cambridge Advanced", "Business English"]
+        # Mock successful resolution
+        mock_anki_client.find_best_matching_deck.return_value = "Cambridge English B2"
+        # Mock finding notes after resolution
+        mock_anki_client.find_notes.side_effect = [[], [1, 2, 3]]
+        
+        result = await logic_service.list_cards(
+            deck="Cambridge",
+            field="Example",
+            filter_description="",
+            limit=3,
+            position="top"
+        )
+        
+        assert isinstance(result, ListCardsResponse)
+        assert result.total_found == 3
+        assert result.deck_resolved == "Cambridge"  # Original deck name
+        assert len(result.items) == 3
+        
+        # Verify deck resolution was attempted
+        mock_anki_client.find_best_matching_deck.assert_called_once_with("Cambridge")
+        mock_anki_client.get_deck_names.assert_called_once()
 
 
 class TestErrorHandling:
