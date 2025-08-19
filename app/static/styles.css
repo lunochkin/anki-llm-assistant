@@ -146,11 +146,18 @@ header p {
     border-radius: 25px;
     font-size: 16px;
     outline: none;
-    transition: border-color 0.2s ease;
+    transition: all 0.2s ease;
 }
 
-#messageInput:focus {
+#messageInput:focus,
+#messageInput.focused {
     border-color: #007AFF;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    transform: scale(1.02);
+}
+
+#messageInput.focused {
+    animation: inputFocus 0.3s ease-out;
 }
 
 #sendButton {
@@ -234,6 +241,17 @@ header p {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes inputFocus {
+    from {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.1);
+    }
+    to {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
     }
 }
 

@@ -19,11 +19,33 @@ class AnkiLLMAssistant {
         this.bindEvents();
         this.checkHealth();
         this.setInterval(this.checkHealth.bind(this), 30000); // Check every 30 seconds
+        
+        // Auto-focus the input field on page load
+        this.messageInput.focus();
     }
     
     bindEvents() {
         this.chatForm.addEventListener('submit', this.handleSubmit.bind(this));
         this.messageInput.addEventListener('keypress', this.handleKeyPress.bind(this));
+        
+        // Focus input when clicking anywhere in the chat container
+        this.chatMessages.addEventListener('click', () => {
+            if (!this.isProcessing) {
+                this.messageInput.focus();
+            }
+        });
+        
+        // Focus input when the window regains focus (user returns to tab)
+        window.addEventListener('focus', () => {
+            if (!this.isProcessing) {
+                this.ensureInputFocus();
+            }
+        });
+        
+        // Remove focus indicator when input loses focus
+        this.messageInput.addEventListener('blur', () => {
+            this.messageInput.classList.remove('focused');
+        });
     }
     
     handleKeyPress(event) {
@@ -117,6 +139,9 @@ class AnkiLLMAssistant {
         
         // Scroll to bottom
         this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+        
+        // Auto-focus the input field after adding a message
+        this.ensureInputFocus();
     }
     
     async confirmChanges() {
@@ -153,6 +178,8 @@ class AnkiLLMAssistant {
             this.addMessage('error', `Error: ${error.message}`);
         } finally {
             this.setProcessing(false);
+            // Auto-focus the input field after confirmation
+            this.ensureInputFocus();
         }
     }
     
@@ -167,7 +194,26 @@ class AnkiLLMAssistant {
         } else {
             this.sendButton.innerHTML = '<span>Send</span>';
             this.sendButton.classList.remove('loading');
+            
+            // Auto-focus the input field after processing is complete
+            this.ensureInputFocus();
         }
+    }
+    
+    ensureInputFocus() {
+        // Focus the input field if it's not disabled and not currently processing
+        if (!this.isProcessing && !this.messageInput.disabled) {
+            this.messageInput.focus();
+            // Add visual focus indicator
+            this.messageInput.classList.add('focused');
+            console.log('Input field focused automatically');
+        }
+    }
+    
+    blurInput() {
+        // Remove focus and visual indicator
+        this.messageInput.blur();
+        this.messageInput.classList.remove('focused');
     }
     
     async checkHealth() {
