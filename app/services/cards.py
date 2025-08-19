@@ -34,7 +34,7 @@ class CardService:
         original_deck = deck  # Track original deck name for resolution info
         try:
             # Try to resolve deck name and find notes
-            deck, note_ids = await self._resolve_deck_and_find_notes(deck, field)
+            deck, note_ids, field = await self._resolve_deck_and_find_notes(deck, field)
             
             if not note_ids:
                 return ListCardsResponse(
@@ -74,7 +74,7 @@ class CardService:
             logger.error(f"Failed to list cards: {e}")
             raise CardServiceError(f"Listing cards failed: {e}")
 
-    async def _resolve_deck_and_find_notes(self, deck: str, field: str) -> tuple[str, List[int]]:
+    async def _resolve_deck_and_find_notes(self, deck: str, field: str) -> tuple[str, List[int], str]:
         """Resolve deck name and find notes, with intelligent deck name resolution."""
         # First try with the specified field
         query = self.anki_client.build_query(deck, field)
@@ -119,7 +119,7 @@ class CardService:
             else:
                 logger.warning(f"Could not auto-detect a suitable field for deck '{deck}'")
         
-        return deck, note_ids
+        return deck, note_ids, field
 
     async def _prepare_card_data(self, note_ids: List[int], field: str) -> List[Dict[str, Any]]:
         """Prepare card data from note IDs."""
