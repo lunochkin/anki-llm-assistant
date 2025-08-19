@@ -4,7 +4,7 @@ import logging
 from fastapi import APIRouter, HTTPException, Depends
 from app.models.schemas import (
     CompactRequest, CompactPreviewResponse, ApplySummary,
-    RollbackRequest, RollbackResponse, ListLongestRequest, ListLongestResponse
+    RollbackRequest, RollbackResponse
 )
 from app.services.logic import LogicService, LogicServiceError
 
@@ -62,21 +62,4 @@ async def rollback(
         )
     except LogicServiceError as e:
         logger.error(f"Rollback failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/list-longest", response_model=ListLongestResponse)
-async def list_longest(
-    request: ListLongestRequest,
-    logic_service: LogicService = Depends(get_logic_service)
-):
-    """List longest examples in a deck."""
-    try:
-        return await logic_service.list_longest_examples(
-            deck=request.deck,
-            field=request.field,
-            limit=request.limit
-        )
-    except LogicServiceError as e:
-        logger.error(f"List longest failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))

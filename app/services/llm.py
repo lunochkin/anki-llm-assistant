@@ -36,7 +36,7 @@ class LLMService:
 Command: {message}
 
 Return a JSON object with these fields:
-- action: "compact_examples", "rollback", "list_longest", "list_cards", or "list_decks"
+- action: "compact_examples", "rollback", "list_cards", or "list_decks"
 - deck: deck name (string, required for all actions except "list_decks")
 - field: field name (string, default "Example", not needed for "list_decks")
 - limit: maximum number of notes (integer, default 30, not needed for "list_decks")
@@ -48,10 +48,6 @@ Return a JSON object with these fields:
 Examples:
 - "Compact examples in deck 'News B2', preview 5, apply 30" → {{"action": "compact_examples", "deck": "News B2", "preview_count": 5, "limit": 30, "confirm": false}}
 - "Rollback compacted examples in 'News B2'" → {{"action": "rollback", "deck": "News B2"}}
-- "List 10 longest examples in 'News B2'" → {{"action": "list_longest", "deck": "News B2", "limit": 10}}
-- "List top 10 cards in the A deck" → {{"action": "list_longest", "deck": "A", "limit": 10}}
-- "List 5 longest Front field in A deck" → {{"action": "list_longest", "deck": "A", "field": "Front", "limit": 5}}
-- "Show longest Back fields in deck B" → {{"action": "list_longest", "deck": "B", "field": "Back"}}
 - "Find cards with business vocabulary in deck 'Business English'" → {{"action": "list_cards", "deck": "Business English", "filter_description": "business vocabulary", "limit": 10}}
 - "Show me cards about travel in deck 'Travel Phrases'" → {{"action": "list_cards", "deck": "Travel Phrases", "filter_description": "travel related content", "limit": 5}}
 - "List bottom 5 cards in deck A" → {{"action": "list_cards", "deck": "A", "position": "bottom", "limit": 5}}

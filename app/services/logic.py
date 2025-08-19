@@ -3,12 +3,11 @@
 import logging
 import secrets
 from typing import List, Dict, Any, Optional
-from app.services.anki import AnkiConnectClient, AnkiConnectError
-from app.services.llm import LLMService, LLMServiceError
+from app.services.anki import AnkiConnectClient
+from app.services.llm import LLMService
 from app.models.schemas import (
     CompactRequest, CompactPreviewResponse, PreviewDiff, 
-    ApplySummary, ListLongestResponse, ListLongestItem,
-    RollbackResponse, ListCardsRequest, ListCardsResponse, ListCardsItem
+    ApplySummary, RollbackResponse, ListCardsResponse, ListCardsItem
 )
 
 logger = logging.getLogger(__name__)
@@ -220,73 +219,6 @@ class LogicService:
             logger.error(f"Failed to rollback: {e}")
             raise LogicServiceError(f"Rollback failed: {e}")
 
-    async def list_longest_examples(
-        self, 
-        deck: str, 
-        field: str = "Example", 
-        limit: int = 10
-    ) -> ListLongestResponse:
-        """List the longest examples in a deck."""
-        try:
-            # First try with the specified field
-            query = self.anki_client.build_query(deck, field)
-            note_ids = await self.anki_client.find_notes(query)
-            
-            # If no notes found with specified field, try to auto-detect a better field
-            if not note_ids and field == "Example":
-                logger.info(f"No notes found with field '{field}' in deck '{deck}', attempting auto-detection")
-                detected_field = await self.anki_client.detect_content_field(deck)
-                if detected_field:
-                    logger.info(f"Auto-detected field '{detected_field}' for deck '{deck}'")
-                    field = detected_field
-                    query = self.anki_client.build_query(deck, field)
-                    note_ids = await self.anki_client.find_notes(query)
-                    logger.info(f"Found {len(note_ids)} notes with detected field '{field}'")
-                else:
-                    logger.warning(f"Could not auto-detect a suitable field for deck '{deck}'")
-            
-            if not note_ids:
-                return ListLongestResponse(items=[], total_found=0)
-            
-            # Get note information
-            notes = await self.anki_client.notes_info(note_ids)
-            
-            # Extract examples and sort by length
-            examples = []
-            for note in notes:
-                fields = note.get("fields", {})
-                if field in fields and fields[field]["value"]:
-                    example_text = fields[field]["value"]
-                    word_count = len(example_text.split())
-                    examples.append({
-                        "note_id": note["noteId"],
-                        "length": word_count,
-                        "example": example_text
-                    })
-            
-            # Sort by length (descending) and take top limit
-            examples.sort(key=lambda x: x["length"], reverse=True)
-            top_examples = examples[:limit]
-            
-            # Convert to response format
-            items = [
-                ListLongestItem(
-                    note_id=ex["note_id"],
-                    length=ex["length"],
-                    example=ex["example"]
-                )
-                for ex in top_examples
-            ]
-            
-            return ListLongestResponse(
-                items=items,
-                total_found=len(examples)
-            )
-            
-        except Exception as e:
-            logger.error(f"Failed to list longest examples: {e}")
-            raise LogicServiceError(f"Listing failed: {e}")
-
     async def list_cards(
         self, 
         deck: str, 
@@ -358,13 +290,11 @@ class LogicService:
                 fields = note.get("fields", {})
                 if field in fields and fields[field]["value"]:
                     example_text = fields[field]["value"]
-                    headword = self.anki_client.extract_headword(note) or "Unknown"
                     
                     cards_data.append({
                         "note_id": note["noteId"],
-                        "headword": headword,
                         "example": example_text,
-                        "word_count": len(example_text.split())
+                        "word_count": len(example_text.split())  # Add word count for length-based operations
                     })
             
             if not cards_data:
@@ -441,9 +371,3 @@ class LogicService:
         except Exception as e:
             logger.error(f"Failed to list decks: {e}")
             raise LogicServiceError(f"Failed to list decks: {e}")
-
-    async def cleanup_expired_tokens(self, max_age_hours: int = 24):
-        """Clean up expired confirmation tokens."""
-        # This is a simple implementation - in production you might want
-        # to use a proper database with TTL or scheduled cleanup
-        logger.info("Token cleanup not implemented in this version")

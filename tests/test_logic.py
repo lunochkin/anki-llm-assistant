@@ -5,8 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from app.services.logic import LogicService, LogicServiceError
 from app.models.schemas import (
     CompactRequest, CompactPreviewResponse, PreviewDiff,
-    ApplySummary, ListLongestResponse, ListLongestItem,
-    RollbackResponse, ListCardsResponse, ListCardsItem
+    ApplySummary, RollbackResponse, ListCardsResponse, ListCardsItem
 )
 
 
@@ -288,54 +287,6 @@ class TestRollbackCompacted:
         
         assert result.restored == 0
         assert result.untagged == 0
-
-
-class TestListLongestExamples:
-    """Test list longest examples functionality."""
-    
-    async def test_list_longest_success(self, logic_service, mock_anki_client):
-        """Test successful listing of longest examples."""
-        mock_anki_client.find_notes.return_value = [1, 2, 3]
-        mock_anki_client.notes_info.return_value = [
-            {
-                "noteId": 1,
-                "fields": {
-                    "Example": {"value": "This is a very long example sentence with many words"}
-                }
-            },
-            {
-                "noteId": 2,
-                "fields": {
-                    "Example": {"value": "Short sentence"}
-                }
-            },
-            {
-                "noteId": 3,
-                "fields": {
-                    "Example": {"value": "This is another long example sentence that has many words in it"}
-                }
-            }
-        ]
-        
-        result = await logic_service.list_longest_examples("Test Deck", "Example", 2)
-        
-        assert isinstance(result, ListLongestResponse)
-        assert result.total_found == 3
-        assert len(result.items) == 2
-        
-        # Verify items are sorted by length (descending)
-        assert result.items[0].length > result.items[1].length
-        assert result.items[0].note_id == 3  # Longest sentence
-        assert result.items[1].note_id == 1  # Second longest
-    
-    async def test_list_longest_no_notes(self, logic_service, mock_anki_client):
-        """Test listing when no notes are found."""
-        mock_anki_client.find_notes.return_value = []
-        
-        result = await logic_service.list_longest_examples("Test Deck", "Example")
-        
-        assert result.total_found == 0
-        assert result.items == []
 
 
 class TestListCards:
