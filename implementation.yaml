@@ -1,0 +1,13 @@
+runtime:
+  language: python
+  framework: langchain
+  agent_style: react
+  model_env: OPENAI_MODEL            # e.g. gpt-4o, gpt-4.1, etc.
+  temperature: 0
+  max_tokens: 800
+adapters:
+  anki: anki_connect                  # or "mock" for tests
+contracts:
+  tools: tools.yaml
+  replies: reply_contracts.yaml
+invariants: invariants.yaml
