@@ -33,14 +33,7 @@ The Anki LLM Assistant is a chat-based interface that enables users to browse An
 ### Prompt Engineering
 **System Rules**: See `invariants.yaml` for complete business rules.
 
-**Reasoning Format**:
-The agent must follow the ReAct pattern:
-1. **Question**: User's input
-2. **Thought**: Reasoning about what tool to use
-3. **Action**: Tool selection
-4. **Action Input**: Tool parameters
-5. **Observation**: Tool result
-6. **Final Answer**: JSON response matching reply contracts
+**Base Prompt Template**: See `prompts/react_agent.prompt` for the complete ReAct pattern template.
 
 ### Response Formatting
 - All responses must be valid JSON

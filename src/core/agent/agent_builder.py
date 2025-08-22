@@ -3,6 +3,7 @@ from langchain.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_openai import ChatOpenAI
 
 from src.core.tools.tool_registry import ToolRegistry
+from src.core.prompts.prompt_loader import load_prompt_template
 
 
 class AgentBuilder:
@@ -43,27 +44,8 @@ class AgentBuilder:
                "\n".join(self.config.invariants.text_rules)
 
     def _build_prompt(self, system_rules: str) -> ChatPromptTemplate:
-        base_prompt = PromptTemplate.from_template("""
-Answer the following questions as best you can. You have access to the following tools:
-
-{tools}
-
-Use the following format:
-
-Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
-Thought: I now know the final answer
-Final Answer: Return the full tool output as a JSON object in fully standard JSON format, without markdown formatting.
-
-Begin!
-
-Question: {input}
-Thought:{agent_scratchpad}
-""")
+        # Load prompt template from Tier-1 (specs)
+        base_prompt = PromptTemplate.from_template(load_prompt_template("react_agent"))
         prompt = ChatPromptTemplate.from_messages([
             ("system", system_rules),
             ("system", base_prompt.template),
