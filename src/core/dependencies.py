@@ -26,7 +26,13 @@ class DependencyContainer:
     
     def _create_services(self):
         """Create all service instances"""
-        self.anki_service = AnkiService()
+        if self.config.adapters.anki == "anki_connect":
+            raise NotImplementedError("Anki Connect is not implemented yet")
+        elif self.config.adapters.anki == "mock":
+            self.anki_service = AnkiService()
+        else:
+            raise ValueError(f"Invalid Anki runtime: {self.config.adapters.anki}")
+
         self.response_formatter = ResponseFormatter()
     
     def _create_validators(self):

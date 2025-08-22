@@ -12,6 +12,11 @@ class AgentBuilder:
         self.tool_registry = tool_registry
     
     def build_agent(self, model_name: str = None, temperature: float = None) -> AgentExecutor:
+        if self.config.runtime.framework != "langchain":
+            raise ValueError("Only LangChain framework is supported")
+        if self.config.runtime.agent_style != "react":
+            raise ValueError("Only ReAct agent style is supported")
+        
         # Use config defaults if not provided
         if model_name is None:
             model_name = self.config.model_name
