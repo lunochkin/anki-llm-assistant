@@ -16,17 +16,11 @@ The Anki LLM Assistant is a chat-based interface that enables users to browse An
 
 ## Tool Specifications
 
-### 1. anki_list_decks
-**Purpose**: Retrieve a list of available Anki decks with metadata
+See `tools.yaml` for complete tool specifications including inputs, outputs, and purposes.
 
-**Input**: `limit: int` (max value from invariants)
-**Output**: `DeckListMessage` model from `schemas/models.py`
-
-### 2. anki_list_cards
-**Purpose**: Retrieve cards from a specific Anki deck
-
-**Input**: `deck: str, limit: int` (max value from invariants)
-**Output**: `CardListMessage` model from `schemas/models.py`
+**Available Tools:**
+- `anki_list_decks`
+- `anki_list_cards`
 
 ## Agent Behavior Specification
 
