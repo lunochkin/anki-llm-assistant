@@ -1,17 +1,13 @@
 """
-Core contracts and validation models for Anki LLM Assistant.
+Pydantic models for Anki LLM Assistant.
 
-This module defines the business logic for data validation,
-message contracts, and response formatting rules.
+This file contains the core data models used throughout the system.
+These models are in Tier-1 (specs) and are imported directly by Tier-2 code.
 """
 
 from typing import List, Literal, Union
-from pydantic import BaseModel, Field, ValidationError
-from ..configs.config import get_default_config
-
-# Get invariants from new config system
-config = get_default_config()
-INV = config.invariants
+from pydantic import BaseModel, Field
+from src.core.configs.config import get_default_config
 
 
 class Deck(BaseModel):
@@ -19,9 +15,12 @@ class Deck(BaseModel):
     note_count: int
 
 
+# Get invariants from config system
+config = get_default_config()
+
 class DeckListMessage(BaseModel):
     kind: Literal["deck_list"]
-    decks: List[Deck] = Field(max_length=INV.max_decks)
+    decks: List[Deck] = Field(max_length=config.invariants.max_decks)
 
 
 class Card(BaseModel):
@@ -33,7 +32,7 @@ class Card(BaseModel):
 class CardListMessage(BaseModel):
     kind: Literal["card_list"]
     deck: str
-    cards: List[Card] = Field(max_length=INV.max_cards)
+    cards: List[Card] = Field(max_length=config.invariants.max_cards)
 
 
 ReplyMessage = Union[DeckListMessage, CardListMessage]
@@ -48,5 +47,5 @@ def validate_reply(payload: dict) -> ReplyMessage:
             return CardListMessage(**payload)
         else:
             raise ValueError(f"Unknown message kind: {payload.get('kind')}")
-    except ValidationError as e:
+    except Exception as e:
         raise ValueError(f"Validation failed: {e}")

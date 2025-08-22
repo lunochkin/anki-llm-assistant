@@ -5,14 +5,13 @@ This package contains the business logic for data validation,
 message contracts, and response formatting rules.
 """
 
-from .reply_contracts import (
+from specs.schemas.models import (
     Deck,
     DeckListMessage,
     Card,
     CardListMessage,
     ReplyMessage,
-    validate_reply,
-    INV
+    validate_reply
 )
 
 __all__ = [
@@ -21,6 +20,5 @@ __all__ = [
     "Card",
     "CardListMessage",
     "ReplyMessage",
-    "validate_reply",
-    "INV"
+    "validate_reply"
 ]
