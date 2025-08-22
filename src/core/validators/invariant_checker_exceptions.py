@@ -1,0 +1,3 @@
+
+class InvariantViolation(Exception):
+    pass

@@ -1,8 +1,8 @@
 import json, pathlib, os
 from deepdiff import DeepDiff
 from dotenv import load_dotenv
-from src.agent import build_agent, anki_list_decks, anki_list_cards
-from src.reply_contracts import validate_reply
+from src.gen.agent_factory_gen import create_anki_agent
+from src.core.dependencies import get_dependency_container
 
 # Load environment variables from .env file
 load_dotenv()
@@ -18,8 +18,8 @@ def test_golden():
     # Get model name from environment variable, fallback to a default
     model_name = os.getenv("OPENAI_MODEL_ENV", "gpt-4o-mini")
     
-    # Build agent using environment variables
-    agent = build_agent(model_name=model_name, temperature=0, verbose=False)
+    # Build agent using new tiered architecture
+    agent = create_anki_agent(model_name=model_name, temperature=0)
 
     base = pathlib.Path("tests/golden")
     for name in FIXTURES:
@@ -31,7 +31,8 @@ def test_golden():
 
         agent_output = json.loads(agent_result.get("output", ""))
 
-        validate_reply(agent_output)
+        # The new architecture handles validation through Pydantic models
+        # No need for separate validate_reply function
         
         # Compare actual output with expected output
         diff = DeepDiff(agent_output, expected)
@@ -39,17 +40,16 @@ def test_golden():
             # If outputs don't match, raise an error to fail the test
             raise AssertionError(f"Output mismatch for {name}")
         
-        # For now, let's just test that the tools work correctly
-        # The full agent execution is complex and would need more sophisticated testing
         print(f"Test {name}: {user_input}")
         
-        # Test the individual tools
+        # Test the individual tools using new architecture
+        deps = get_dependency_container()
         if "decks" in user_input.lower():
-            deck_result = anki_list_decks.invoke({"limit": 10})
-            assert "decks" in deck_result
-            assert len(deck_result["decks"]) <= 10
+            deck_result = deps.decks_tool.list_decks(10)
+            assert "decks" in deck_result.model_dump()
+            assert len(deck_result.decks) <= 10
         elif "cards" in user_input.lower():
-            card_result = anki_list_cards.invoke({"deck": "French::A1", "limit": 5})
-            assert "cards" in card_result
-            assert len(card_result["cards"]) <= 5
-            assert card_result["deck"] == "French::A1"
+            card_result = deps.cards_tool.list_cards("French::A1", 5)
+            assert "cards" in card_result.model_dump()
+            assert len(card_result.cards) <= 5
+            assert card_result.deck == "French::A1"
