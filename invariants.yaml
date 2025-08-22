@@ -1,0 +1,11 @@
+inv:
+  INV-READ-1:
+    desc: "Never show more than N decks."
+    N: 10
+  INV-READ-2:
+    desc: "Never show more than M cards per deck."
+    M: 10
+  INV-READ-3:
+    desc: "If more exist, summarize or paginate."
+  INV-READ-4:
+    desc: "Do not reveal media/tags unless explicitly asked."
