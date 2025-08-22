@@ -7,7 +7,7 @@ class Invariants:
     max_cards: int
     text_rules: list[str]
 
-def load_invariants(path: str = "invariants.yaml") -> Invariants:
+def load_invariants(path: str = "specs/invariants.yaml") -> Invariants:
     data = yaml.safe_load(pathlib.Path(path).read_text())["inv"]
     return Invariants(
         max_decks = data["INV-READ-1"]["N"],

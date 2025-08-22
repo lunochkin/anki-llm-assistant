@@ -19,7 +19,7 @@ def test_golden():
     model_name = os.getenv("OPENAI_MODEL_ENV", "gpt-4o-mini")
     
     # Build agent using environment variables
-    agent = build_agent(model_name=model_name, temperature=0)
+    agent = build_agent(model_name=model_name, temperature=0, verbose=False)
 
     base = pathlib.Path("tests/golden")
     for name in FIXTURES:
@@ -27,10 +27,11 @@ def test_golden():
         expected = read_json(base / f"{name}.output.json")
 
         # Run agent
-        result = agent.invoke({"input": user_input})
-        print(f"Agent result: {result}")
+        agent_result = agent.invoke({"input": user_input})
 
-        agent_output = json.loads(result.get("output", ""))
+        agent_output = json.loads(agent_result.get("output", ""))
+
+        validate_reply(agent_output)
         
         # Compare actual output with expected output
         diff = DeepDiff(agent_output, expected)

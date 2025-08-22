@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "anki_list_cards Input Schema",
+  "description": "Input parameters for listing cards from a specific Anki deck",
+  "type": "object",
+  "properties": {
+    "deck": {
+      "type": "string",
+      "description": "Exact deck name to query"
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "description": "Maximum number of cards to return"
+    }
+  },
+  "required": ["deck", "limit"],
+  "additionalProperties": false
+}
