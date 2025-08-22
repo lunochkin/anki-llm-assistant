@@ -1,6 +1,6 @@
 # tools.yaml
 tools:
-  - name: anki.list_decks
+  - name: anki_list_decks
     description: Return user decks.
     parameters:
       type: object
@@ -25,7 +25,7 @@ tools:
             required: [name, note_count]
       required: [decks]
 
-  - name: anki.list_cards
+  - name: anki_list_cards
     description: Return cards in a given deck (front/back only).
     parameters:
       type: object

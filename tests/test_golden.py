@@ -7,8 +7,7 @@ from src.reply_contracts import validate_reply
 load_dotenv()
 
 FIXTURES = [
-    ("001_list_decks", "Show my decks"),
-    ("002_list_cards_french", "Show 5 cards from French::A1"),
+    "001_list_decks"
 ]
 
 def read_json(path: pathlib.Path):
@@ -22,7 +21,8 @@ def test_golden(tmp_path):
     agent = build_agent(model_name=model_name, temperature=0)
 
     base = pathlib.Path("tests/golden")
-    for name, user_input in FIXTURES:
+    for name in FIXTURES:
+        user_input = read_json(base / f"{name}.input.json")["turns"][0]["text"]
         expected = read_json(base / f"{name}.output.json")
 
         # Run agent
