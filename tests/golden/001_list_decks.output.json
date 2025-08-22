@@ -1,6 +1,6 @@
 {
   "tool_calls": [
-    {"name": "anki.list_decks", "args": {"limit": 10}}
+    {"name": "anki_list_decks", "args": {"limit": 10}}
   ],
   "messages": [
     {
