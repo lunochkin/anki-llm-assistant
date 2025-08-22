@@ -1,15 +1,7 @@
 {
-  "tool_calls": [
-    {"name": "anki_list_decks", "args": {"limit": 10}}
-  ],
-  "messages": [
-    {
-      "kind": "deck_list",
-      "decks": [
-        {"name": "French::A1", "note_count": 312},
-        {"name": "EVP C1/C2", "note_count": 10452}
-      ],
-      "next_hint": "Say 'show 10 cards from French::A1' to preview."
-    }
+  "kind": "deck_list",
+  "decks": [
+    {"name": "French::A1", "note_count": 312},
+    {"name": "EVP C1/C2", "note_count": 10452}
   ]
 }
