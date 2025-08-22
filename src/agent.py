@@ -2,7 +2,7 @@ from langchain.tools import tool
 from langchain.agents import create_react_agent, AgentExecutor
 from langchain_openai import ChatOpenAI
 from langchain import hub
-from langchain.prompts import ChatPromptTemplate
+from langchain.prompts import ChatPromptTemplate, PromptTemplate
 
 from src.config import load_invariants
 import os
@@ -30,7 +30,7 @@ def anki_list_decks(limit: int):
         limit = int(limit)
     decks = _anki_list_decks(limit)
     assert len(decks) <= INV.max_decks, "INV-READ-1 violated"
-    return {"decks": decks}
+    return {"kind": "deck_list", "decks": decks}
 
 @tool("anki_list_cards")
 def anki_list_cards(deck: str, limit: int):
@@ -51,9 +51,31 @@ def build_agent(model_name: str, temperature: float = 0) -> AgentExecutor:
         api_key=os.getenv("OPENAI_API_KEY"),
     )
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=UserWarning, module="langsmith")
-        base_prompt = hub.pull("hwchase17/react")
+    base_prompt = PromptTemplate.from_template("""
+Answer the following questions as best you can. You have access to the following tools:
+
+{tools}
+
+Use the following format:
+
+Question: the input question you must answer
+Thought: you should always think about what to do
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+... (this Thought/Action/Action Input/Observation can repeat N times)
+Thought: I now know the final answer
+Final Answer: Return the full tool output as a JSON object in fully standard JSON format, without markdown formatting.
+
+Begin!
+
+Question: {input}
+Thought:{agent_scratchpad}
+""")
+
+    # with warnings.catch_warnings():
+    #     warnings.filterwarnings("ignore", category=UserWarning, module="langsmith")
+    #     base_prompt = hub.pull("hwchase17/react")
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", SYSTEM_RULES),

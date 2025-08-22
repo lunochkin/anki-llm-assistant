@@ -1,4 +1,5 @@
 import json, pathlib, os
+from deepdiff import DeepDiff
 from dotenv import load_dotenv
 from src.agent import build_agent, anki_list_decks, anki_list_cards
 from src.reply_contracts import validate_reply
@@ -13,7 +14,7 @@ FIXTURES = [
 def read_json(path: pathlib.Path):
     return json.loads(path.read_text())
 
-def test_golden(tmp_path):
+def test_golden():
     # Get model name from environment variable, fallback to a default
     model_name = os.getenv("OPENAI_MODEL_ENV", "gpt-4o-mini")
     
@@ -28,6 +29,14 @@ def test_golden(tmp_path):
         # Run agent
         result = agent.invoke({"input": user_input})
         print(f"Agent result: {result}")
+
+        agent_output = json.loads(result.get("output", ""))
+        
+        # Compare actual output with expected output
+        diff = DeepDiff(agent_output, expected)
+        if diff:
+            # If outputs don't match, raise an error to fail the test
+            raise AssertionError(f"Output mismatch for {name}")
         
         # For now, let's just test that the tools work correctly
         # The full agent execution is complex and would need more sophisticated testing
