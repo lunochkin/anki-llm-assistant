@@ -6,7 +6,7 @@ This file provides the main interface for users to create and use agents.
 """
 
 import os
-from .agent_factory_gen import create_anki_agent
+from src.gen.agent_factory_gen import create_anki_agent
 
 
 def main():

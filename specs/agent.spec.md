@@ -2,9 +2,7 @@
 
 ## Specification References
 This specification references the following files:
-- **Tool Input Schemas**: `schemas/tools/`
-- **Response Schemas**: `schemas/responses/`
-- **Common Definitions**: `schemas/common.schema.json`
+- **Pydantic Models**: `schemas/models.py`
 - **Invariants**: `invariants.yaml`
 
 ## Overview
@@ -21,16 +19,14 @@ The Anki LLM Assistant is a chat-based interface that enables users to browse An
 ### 1. anki_list_decks
 **Purpose**: Retrieve a list of available Anki decks with metadata
 
-**Input Schema**: See `schemas/tools/anki_list_decks.schema.json`
-
-**Output Schema**: See `schemas/responses/deck_list.schema.json`
+**Input**: `limit: int` (max value from invariants)
+**Output**: `DeckListMessage` model from `schemas/models.py`
 
 ### 2. anki_list_cards
 **Purpose**: Retrieve cards from a specific Anki deck
 
-**Input Schema**: See `schemas/tools/anki_list_cards.schema.json`
-
-**Output Schema**: See `schemas/responses/card_list.schema.json`
+**Input**: `deck: str, limit: int` (max value from invariants)
+**Output**: `CardListMessage` model from `schemas/models.py`
 
 ## Agent Behavior Specification
 
@@ -85,7 +81,7 @@ See `invariants.yaml`.
 5. **Privacy compliance**: Verify no sensitive data leakage
 
 ### Validation Criteria
-- Output matches exact JSON schemas
+- Output matches Pydantic models from `schemas/models.py`
 - All invariants are satisfied
 - Tool calls use correct parameters
 - Response formatting is consistent
@@ -94,9 +90,9 @@ See `invariants.yaml`.
 ## Implementation Requirements
 
 ### Tool Registration
-- Tools must be registered with exact names and schemas
+- Tools must be registered with exact names
 - Parameter validation happens at tool level
-- Output validation ensures contract compliance
+- Output validation ensures Pydantic model compliance
 
 ### Performance Requirements
 - Tool execution should be fast (<100ms for typical queries)

@@ -7,7 +7,7 @@ This file provides CLI access to the agent functionality.
 
 import argparse
 import sys
-from .agent_factory_gen import create_anki_agent, create_gpt4_agent, create_test_agent
+from src.gen.agent_factory_gen import create_anki_agent, create_gpt4_agent, create_test_agent
 
 
 def create_cli_parser():
