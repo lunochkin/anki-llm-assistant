@@ -10,9 +10,9 @@ from specs.schemas.models import (
     DeckListMessage,
     Card,
     CardListMessage,
-    ReplyMessage,
-    validate_reply
+    ReplyMessage
 )
+from src.core.validators.reply_validator import validate_reply
 
 __all__ = [
     "Deck",
