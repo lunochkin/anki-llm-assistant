@@ -1,0 +1,29 @@
+---
+description: Spec-first house rules for this repo (tiers, tests, tooling).
+alwaysApply: true
+---
+
+# Spec-first rules (authoritative)
+- Generate code **only** from Tier-1 specs. If a spec is missing/ambiguous, propose a small spec diff first; do **not** guess.
+- Keep **one tool layer** in the backend agent. Do not duplicate tools via UI function calls.
+- Tier-3 files are **disposable**. No business logic there; mark them generated.
+
+## Tiers & folders
+- **TIER-1 (Specs/Invariants)** → `/specs` (schemas, invariants, prompts-as-spec, acceptance criteria). See @/specs/README-cursor.md.
+- **TIER-2 (Interpreters/Tools)** → `/services/**/core` (validators, prompt assemblers, retrievers, tool registry).
+- **TIER-3 (Generated)** → `/services/**/gen` (handlers/DTOs/routers). Add `// GENERATED – DO NOT EDIT`.
+
+## Workflow (Cursor must follow)
+1. **Spec first:** author/patch `.spec.md` + `.schema.json` + AC/examples under `/specs/`.
+2. **Interpreter + tests:** implement deterministic Tier-2 using the spec; add contract + golden tests under `/tests/`.
+3. **Generate Tier-3:** only via Tier-2; no hidden logic.
+4. **Long/side-effectful tools:** wrap with Temporal workflow + activities; expose progress via Signals/Queries; stream status/events to UI.
+
+## Data & infra defaults
+- SQL truth in `/sql` with `EXPLAIN` notes; prefer Postgres (OLTP) + Snowflake (analytics).
+- Observability: instrument agent runs (LangSmith) and correlate with Temporal `workflowId`. Log request/run IDs.
+
+## Guardrails
+- Don’t call external APIs in Workflows; do it in Activities.
+- Idempotency: every tool with side effects must accept an idempotency key.
+- Prefer streaming; avoid buffering whole responses server-side.

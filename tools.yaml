@@ -1,0 +1,55 @@
+# tools.yaml
+tools:
+  - name: anki_list_decks
+    description: Return user decks.
+    parameters:
+      type: object
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 10
+      required: []
+    returns:
+      type: object
+      properties:
+        decks:
+          type: array
+          maxItems: 10           # mirrors INV-READ-1
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              note_count: { type: integer }
+            required: [name, note_count]
+      required: [decks]
+
+  - name: anki_list_cards
+    description: Return cards in a given deck (front/back only).
+    parameters:
+      type: object
+      properties:
+        deck:
+          type: string
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 10
+          default: 10
+      required: [deck]
+    returns:
+      type: object
+      properties:
+        deck: { type: string }
+        cards:
+          type: array
+          maxItems: 10           # mirrors INV-READ-2
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              front: { type: string }
+              back: { type: string }
+            required: [id, front, back]
+      required: [deck, cards]

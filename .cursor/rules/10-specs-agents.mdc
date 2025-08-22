@@ -1,0 +1,26 @@
+---
+description: Rules that apply when working in specs and agent code.
+globs:
+  - "specs/**"
+  - "services/agent/**"
+  - "services/**/core/**"
+---
+
+# When editing specs or agent code
+## Authoring/maintaining specs
+- Keep input/output schemas in JSON Schema. Add **invariants** + **AC** + **examples** in `.spec.md`.
+- Name files `feature.area.action.v1.spec.md` and `feature.area.action.v1.schema.json`.
+- Update a **changelog block** in the spec when you change contracts.
+
+## Interpreters (Tier-2)
+- Implement parsers/validators from the schema; fail closed on unknown fields.
+- Prompt assemblers are deterministic: explicit templates + slots; seed **golden tests** from spec examples.
+- RAG: document chunking & filters in `retrieval.spec.md`; tests must include top-k assertions and citation checks.
+
+## Tools
+- Register tools centrally; validate inputs with the schema; return typed results.
+- Mark tools `long: true` if they do I/O > ~2–3s or side effects → offload to Temporal.
+
+## Tests
+- **Contract tests:** mirror AC list (success + failure).
+- **Golden tests:** lock prompt/RAG snapshots to flag regressions.

@@ -1,0 +1,4 @@
+run:
+  env:
+    VIRTUAL_ENV: .venv
+    PATH: .venv/bin:$PATH
