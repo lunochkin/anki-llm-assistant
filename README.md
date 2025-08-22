@@ -23,7 +23,7 @@ The Anki LLM Assistant lets you interact with your Anki collection using plain E
 ### Prerequisites
 - Anki installed and running
 - AnkiConnect add-on installed
-- Python 3.8+
+- Python 3.11+
 
 ### Installation
 ```bash
@@ -32,7 +32,7 @@ git clone <repository-url>
 cd anki-llm-assistant
 
 # Install dependencies
-pip install -r requirements.txt
+uv sync
 
 # Set up environment variables
 cp env.example .env
@@ -42,7 +42,10 @@ cp env.example .env
 ### Usage
 ```bash
 # Start the assistant
-python src/agent.py
+python src/gen/main.py
+
+# Or use the CLI
+python src/gen/cli.py --query "Show my decks"
 
 # Or run specific tasks
 python tasks.py
@@ -61,19 +64,32 @@ python tasks.py
 
 ## Architecture
 
-This project follows a **spec-first development approach**:
+This project follows a **spec-first development approach** with a **tiered architecture**:
 
-- **`/specs/`** - Complete specifications and schemas
-- **`/src/`** - Implementation code
-- **`/tests/` - Test suites and golden test data**
+- **`/specs/`** - Tier-1: Complete specifications, schemas, and configuration
+- **`/src/core/`** - Tier-2: Business logic and services
+- **`/src/gen/`** - Tier-3: Generated interfaces and entry points
+- **`/tests/`** - Test suites and golden test data
+
+### Key Principles
+- **Single source of truth**: All specifications live in `/specs/`
+- **No hidden logic**: Tier-3 is generated from Tier-2, which implements Tier-1
+- **Executable specs**: Configuration files drive system behavior
 
 ## Development
 
 For developers interested in contributing or understanding the system architecture:
 
 - **Specifications**: See `/specs/` for complete system specifications
-- **Implementation**: Check `/src/` for the actual code
+- **Core Logic**: Check `/src/core/` for business logic and services
+- **Generated Code**: Review `/src/gen/` for interfaces and entry points
 - **Testing**: Review `/tests/` for test coverage and examples
+
+### Development Workflow
+1. **Spec first**: Modify files in `/specs/` to define behavior
+2. **Implement**: Add business logic in `/src/core/`
+3. **Generate**: Create interfaces in `/src/gen/` (or auto-generate later)
+4. **Test**: Ensure implementation matches specifications
 
 ## Contributing
 
@@ -84,7 +100,7 @@ For developers interested in contributing or understanding the system architectu
 
 ## License
 
-[Add your license information here]
+MIT
 
 ## Support
 
