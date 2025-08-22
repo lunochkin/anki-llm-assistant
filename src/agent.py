@@ -1,12 +1,10 @@
 from langchain.tools import tool
 from langchain.agents import create_react_agent, AgentExecutor
 from langchain_openai import ChatOpenAI
-from langchain import hub
 from langchain.prompts import ChatPromptTemplate, PromptTemplate
 
 from src.config import load_invariants
 import os
-import warnings
 
 INV = load_invariants()
 
@@ -44,7 +42,7 @@ def anki_list_cards(deck: str, limit: int):
 
 SYSTEM_RULES = "You are a chat assistant for reading Anki data.\n" + "\n".join(INV.text_rules)
 
-def build_agent(model_name: str, temperature: float = 0) -> AgentExecutor:
+def build_agent(model_name: str, temperature: float = 0, verbose: bool = False) -> AgentExecutor:
     llm = ChatOpenAI(
         model=model_name,
         temperature=temperature,
@@ -84,4 +82,4 @@ Thought:{agent_scratchpad}
     tools = [anki_list_decks, anki_list_cards]
 
     agent = create_react_agent(llm, tools, prompt)
-    return AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    return AgentExecutor(agent=agent, tools=tools, verbose=verbose, handle_parsing_errors=True)

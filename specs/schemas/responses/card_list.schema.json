@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Card List Response Schema",
+  "description": "Response format for card listing operations",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "const": "card_list"
+    },
+    "deck": {
+      "type": "string",
+      "description": "The deck name that was queried"
+    },
+    "cards": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique card identifier"
+          },
+          "front": {
+            "type": "string",
+            "description": "Front side content of the card"
+          },
+          "back": {
+            "type": "string",
+            "description": "Back side content of the card"
+          }
+        },
+        "required": ["id", "front", "back"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["kind", "deck", "cards"],
+  "additionalProperties": false
+}
