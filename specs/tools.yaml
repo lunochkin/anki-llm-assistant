@@ -1,0 +1,27 @@
+tools:
+  anki_list_decks:
+    name: "anki_list_decks"
+    purpose: "Retrieve a list of available Anki decks with metadata"
+    input:
+      limit:
+        type: "int"
+        description: "Maximum number of decks to return"
+        max_value: "from_invariants.max_decks"
+    output:
+      model: "DeckListMessage"
+      description: "List of decks with metadata"
+    
+  anki_list_cards:
+    name: "anki_list_cards"
+    purpose: "Retrieve cards from a specific Anki deck"
+    input:
+      deck:
+        type: "str"
+        description: "Name of the deck to retrieve cards from"
+      limit:
+        type: "int"
+        description: "Maximum number of cards to return"
+        max_value: "from_invariants.max_cards"
+    output:
+      model: "CardListMessage"
+      description: "List of cards from the specified deck"
