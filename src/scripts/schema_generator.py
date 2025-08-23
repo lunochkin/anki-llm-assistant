@@ -2,7 +2,7 @@
 """
 Schema Generator: Converts YAML schemas to Pydantic models
 
-Usage: python src/core/generated/schema_generator.py
+Usage: python src/scripts/schema_generator.py
        or: invoke generate-models
 """
 import yaml

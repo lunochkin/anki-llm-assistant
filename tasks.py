@@ -14,7 +14,7 @@ def cli_query(ctx):
 @task
 def generate_models(ctx):
     """Generate Pydantic models from YAML schemas"""
-    ctx.run("python src/core/generated/schema_generator.py")
+    ctx.run("python src/scripts/schema_generator.py")
 
 @task
 def generate_and_test(ctx):
