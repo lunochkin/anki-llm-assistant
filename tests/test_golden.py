@@ -1,7 +1,7 @@
 import json, pathlib, os
 from deepdiff import DeepDiff
 from dotenv import load_dotenv
-from src.gen.agent_factory_gen import create_anki_agent
+from src.app.agent_factory_gen import create_anki_agent
 from src.core.dependencies import get_dependency_container
 
 # Load environment variables from .env file
