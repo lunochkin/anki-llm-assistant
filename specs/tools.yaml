@@ -6,7 +6,6 @@ tools:
       limit:
         type: "int"
         description: "Maximum number of decks to return"
-        max_value: "from_invariants.max_decks"
     output:
       model: "DeckList"
       description: "List of decks with metadata"
@@ -21,7 +20,6 @@ tools:
       limit:
         type: "int"
         description: "Maximum number of cards to return"
-        max_value: "from_invariants.max_cards"
     output:
       model: "CardList"
       description: "List of cards from the specified deck"

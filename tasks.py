@@ -19,5 +19,5 @@ def generate_models(ctx):
 @task
 def generate_and_test(ctx):
     """Generate models and run tests to verify they work"""
-    ctx.run("python src/core/generated/schema_generator.py")
+    ctx.run("python src/scripts/schema_generator.py")
     ctx.run("python -m pytest tests/ -v")
