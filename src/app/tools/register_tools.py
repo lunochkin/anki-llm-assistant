@@ -7,8 +7,8 @@ This file registers decorated tools with the tool registry.
 
 import yaml
 from pathlib import Path
-from .deck_tools_gen import anki_list_decks
-from .card_tools_gen import anki_list_cards
+from .anki_list_decks_gen import anki_list_decks
+from .anki_list_cards_gen import anki_list_cards
 
 
 def register_generated_tools(registry):

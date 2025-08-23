@@ -1,7 +1,7 @@
 {
   "kind": "deck_list",
   "decks": [
-  {"name": "French::A1", "note_count": 312, "card_count": 0},
-  {"name": "EVP C1/C2", "note_count": 10452, "card_count": 0}
-]
+    {"name": "French::A1", "note_count": 312, "card_count": 0},
+    {"name": "EVP C1/C2", "note_count": 10452, "card_count": 0}
+  ]
 }

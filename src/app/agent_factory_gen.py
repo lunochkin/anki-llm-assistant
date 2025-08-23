@@ -1,7 +1,6 @@
 """
-GENERATED – DO NOT EDIT
+Tier-3 agent factory interface for Anki LLM Assistant.
 
-Tier-3 generated interface for agent creation.
 This file provides factory functions that call Tier-2 business logic.
 """
 

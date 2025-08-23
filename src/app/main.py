@@ -1,12 +1,11 @@
 """
-GENERATED – DO NOT EDIT
-
 Tier-3 main entry point for Anki LLM Assistant.
+
 This file provides the main interface for users to create and use agents.
 """
 
 import os
-from src.gen.agent_factory_gen import create_anki_agent
+from src.app.agent_factory_gen import create_anki_agent
 
 
 def main():
