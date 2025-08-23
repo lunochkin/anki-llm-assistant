@@ -1,0 +1,16 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+type: object
+properties:
+  id:
+    type: integer
+    description: "Card ID"
+  question:
+    type: string
+    description: "Card question/front"
+  answer:
+    type: string
+    description: "Card answer/back"
+  deck:
+    type: string
+    description: "Deck name this card belongs to"
+required: ["id", "question", "answer", "deck"]

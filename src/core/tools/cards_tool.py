@@ -2,7 +2,7 @@ from src.core.services.anki_service import AnkiService
 from src.core.validators.input_validator import InputValidator
 from src.core.validators.invariant_checker import InvariantChecker
 from src.core.services.response_formatter import ResponseFormatter
-from ..contracts import CardListMessage
+from ..contracts import CardList
 
 
 class CardsTool:
@@ -18,7 +18,7 @@ class CardsTool:
         self.invariant_checker = invariant_checker
         self.response_formatter = response_formatter
     
-    def list_cards(self, deck: str, limit: int) -> CardListMessage:
+    def list_cards(self, deck: str, limit: int) -> CardList:
         # Business logic: validate input
         validated_limit = self.validator.validate_deck_limit(limit)
         # Business logic: get data

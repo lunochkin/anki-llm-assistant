@@ -5,20 +5,18 @@ This package contains the business logic for data validation,
 message contracts, and response formatting rules.
 """
 
-from specs.schemas.models import (
+from src.core.generated.models import (
     Deck,
-    DeckListMessage,
+    DeckList,
     Card,
-    CardListMessage,
-    ReplyMessage
+    CardList
 )
 from src.core.validators.reply_validator import validate_reply
 
 __all__ = [
     "Deck",
-    "DeckListMessage", 
+    "DeckList", 
     "Card",
-    "CardListMessage",
-    "ReplyMessage",
+    "CardList",
     "validate_reply"
 ]

@@ -8,7 +8,7 @@ tools:
         description: "Maximum number of decks to return"
         max_value: "from_invariants.max_decks"
     output:
-      model: "DeckListMessage"
+      model: "DeckList"
       description: "List of decks with metadata"
     
   anki_list_cards:
@@ -23,5 +23,5 @@ tools:
         description: "Maximum number of cards to return"
         max_value: "from_invariants.max_cards"
     output:
-      model: "CardListMessage"
+      model: "CardList"
       description: "List of cards from the specified deck"
