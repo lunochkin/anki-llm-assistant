@@ -1,0 +1,16 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+type: object
+properties:
+  name:
+    type: string
+    description: "Deck name"
+  note_count:
+    type: integer
+    minimum: 0
+    description: "Number of notes in the deck"
+  card_count:
+    type: integer
+    minimum: 0
+    description: "Number of cards in the deck"
+    default: 0
+required: ["name", "note_count"]

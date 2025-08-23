@@ -91,6 +91,21 @@ For developers interested in contributing or understanding the system architectu
 3. **Generate**: Create interfaces in `/src/gen/` (or auto-generate later)
 4. **Test**: Ensure implementation matches specifications
 
+### Development Tasks
+```bash
+# Generate Pydantic models from YAML schemas
+invoke generate-models
+
+# Generate models and run tests
+invoke generate-and-test
+
+# Run golden tests
+invoke test-golden
+
+# Test CLI
+invoke cli-query
+```
+
 ## Contributing
 
 1. Read the specifications in `/specs/`

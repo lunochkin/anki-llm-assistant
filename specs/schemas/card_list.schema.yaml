@@ -1,0 +1,16 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+type: object
+properties:
+  kind:
+    type: string
+    enum: ["card_list"]
+    description: "Message type identifier"
+  deck:
+    type: string
+    description: "Deck name"
+  cards:
+    type: array
+    items:
+      $ref: "card.schema.yaml"
+    description: "List of cards"
+required: ["kind", "deck", "cards"]
