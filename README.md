@@ -44,10 +44,10 @@ cp env.example .env
 ### Usage
 ```bash
 # Start the assistant
-python src/gen/main.py
+python -m src.app.main
 
 # Or use the CLI
-python src/gen/cli.py --query "Show my decks"
+python -m src.app.cli --query "Show my decks"
 
 # Or run specific tasks
 python tasks.py
@@ -70,7 +70,7 @@ This project follows a **spec-first development approach** with a **tiered archi
 
 - **`/specs/`** - Tier-1: Complete specifications, schemas, and configuration
 - **`/src/core/`** - Tier-2: Business logic and services
-- **`/src/gen/`** - Tier-3: Generated interfaces and entry points
+- **`/src/app/`** - Tier-3: Generated interfaces and entry points *(named `/src/gen/` when the companion article was written; renamed since)*
 - **`/tests/`** - Test suites and golden test data
 
 ### Key Principles
@@ -146,13 +146,13 @@ For developers interested in contributing or understanding the system architectu
 
 - **Specifications**: See `/specs/` for complete system specifications
 - **Core Logic**: Check `/src/core/` for business logic and services
-- **Generated Code**: Review `/src/gen/` for interfaces and entry points
+- **Generated Code**: Review `/src/app/` for interfaces and entry points
 - **Testing**: Review `/tests/` for test coverage and examples
 
 ### Development Workflow
 1. **Spec first**: Modify files in `/specs/` to define behavior
 2. **Implement**: Add business logic in `/src/core/`
-3. **Generate**: Create interfaces in `/src/gen/` (or auto-generate later)
+3. **Generate**: Create interfaces in `/src/app/` (or auto-generate later)
 4. **Test**: Ensure implementation matches specifications
 
 ### Development Tasks
