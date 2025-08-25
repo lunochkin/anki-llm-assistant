@@ -1,0 +1,11 @@
+{
+  "kind": "card_list",
+  "deck": "French::A1",
+  "cards": [
+    {"id": 1, "question": "Question 1", "answer": "Answer 1", "deck": "French::A1"},
+    {"id": 2, "question": "Question 2", "answer": "Answer 2", "deck": "French::A1"},
+    {"id": 3, "question": "Question 3", "answer": "Answer 3", "deck": "French::A1"},
+    {"id": 4, "question": "Question 4", "answer": "Answer 4", "deck": "French::A1"},
+    {"id": 5, "question": "Question 5", "answer": "Answer 5", "deck": "French::A1"}
+  ]
+}

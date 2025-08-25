@@ -1,0 +1,10 @@
+title: "DeckListInput"
+type: "object"
+properties:
+  limit:
+    type: "integer"
+    description: "Maximum number of decks to return"
+    minimum: 1
+    maximum: 100
+required:
+  - limit

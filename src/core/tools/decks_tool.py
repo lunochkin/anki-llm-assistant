@@ -2,8 +2,7 @@ from src.core.services.anki_service import AnkiService
 from src.core.validators.input_validator import InputValidator
 from src.core.validators.invariant_checker import InvariantChecker
 from src.core.services.response_formatter import ResponseFormatter
-from ..contracts import DeckList
-
+from src.core.contracts import DeckList, DeckListInput
 
 class DecksTool:
     def __init__(
@@ -18,9 +17,9 @@ class DecksTool:
         self.invariant_checker = invariant_checker
         self.response_formatter = response_formatter
     
-    def list_decks(self, limit: int) -> DeckList:
+    def list_decks(self, request: DeckListInput) -> DeckList:
         # Business logic: validate input
-        validated_limit = self.validator.validate_deck_limit(limit)
+        validated_limit = self.validator.validate_deck_limit(request.limit)
         
         # Business logic: get data
         decks = self.anki_service.get_decks(validated_limit)

@@ -7,11 +7,11 @@ Use the following format:
 Question: the input question you must answer
 Thought: you should always think about what to do
 Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
+Action Input: the input to the action as a JSON object in a fully standard format, without markdown formatting.
 Observation: the result of the action
 ... (this Thought/Action/Action Input/Observation can repeat N times)
 Thought: I now know the final answer
-Final Answer: Return the full tool output as a JSON object in fully standard JSON format, without markdown formatting.
+Final Answer: Return the full tool output as a JSON object in fully standard JSON format, without markdown formatting and without omitting any field.
 
 Begin!
 

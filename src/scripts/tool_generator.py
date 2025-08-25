@@ -56,31 +56,40 @@ def generate_tool_file(tool_name: str, tool_spec: Dict[str, Any], gen_dir: Path)
     
     # Extract tool information
     purpose = tool_spec.get('purpose', '')
-    input_specs = tool_spec.get('input', {})
+    input_spec = tool_spec.get('input', {})
     output_spec = tool_spec.get('output', {})
     
-    # Build function parameters and docstring
-    params = []
-    arg_docs = []
-    param_names = []
+    # Load input schema to get parameter information
+    input_schema_name = input_spec.get('schema')
+    if not input_schema_name:
+        raise ValueError(f"Tool {tool_name} missing input schema")
     
-    for param_name, param_spec in input_specs.items():
-        param_type = _get_python_type(param_spec['type'])
-        params.append(f"{param_name}: {param_type}")
-        arg_docs.append(f"{param_name}: {param_spec['description']}")
-        param_names.append(param_name)
+    input_schema = load_schema(input_schema_name)
+    if not input_schema:
+        raise ValueError(f"Could not load input schema {input_schema_name} for tool {tool_name}")
+    
+    # Build function parameters and docstring from schema
+    input_model_name = input_schema.get('title', input_schema_name)
+    properties = input_schema.get('properties', {})
+    param_names = list(properties.keys())
+    
+    # Generate parameter documentation for LLM understanding
+    arg_docs = []
+    for param_name, param_spec in properties.items():
+        param_type = _get_python_type_from_schema(param_spec)
+        description = param_spec.get('description', 'Parameter')
+        arg_docs.append(f"{param_name} ({param_type}): {description}")
     
     # Determine dependency container name and method name
-    if tool_name == "anki_list_decks":
-        dep_name = "decks_tool"
-        method_name = "list_decks"
-    elif tool_name == "anki_list_cards":
-        dep_name = "cards_tool"
-        method_name = "list_cards"
+    # Remove 'anki_' prefix and use consistent naming pattern
+    base_name = tool_name.replace('anki_', '')
+    # Convert snake_case to singular form for dependency name
+    if base_name.startswith('list_'):
+        dep_name = f"{base_name[5:]}_tool"  # Remove 'list_' prefix
+        method_name = base_name
     else:
-        # Fallback: remove 'anki_' prefix and use as base
-        dep_name = f"{tool_name.replace('anki_', '')}_tool"
-        method_name = tool_name.replace('anki_', '')
+        dep_name = f"{base_name}_tool"
+        method_name = base_name
     
     # Generate the tool file content
     content = f'''"""
@@ -92,22 +101,33 @@ This file contains tool decorators that call Tier-2 business logic.
 
 from langchain.tools import tool
 from src.core.dependencies import get_dependency_container
+from src.core.generated.models import {input_model_name}
 
 
 @tool
-def {tool_name}({', '.join(params)}):
+def {tool_name}(input_data: str):
     """
     {purpose}
     
-    Args:
+    Expected input parameters:
         {chr(10).join(f'        {doc}' for doc in arg_docs)}
+    
+    Args:
+        input_data: JSON string containing the input parameters
     
     Returns:
         {output_spec.get('description', 'Tool output')}
     """
     # NO BUSINESS LOGIC - just calls Tier-2
+    import json
+    
     deps = get_dependency_container()
-    result = deps.{dep_name}.{method_name}({', '.join(param_names)})
+    
+    # Parse JSON string and create Pydantic model instance
+    input_dict = json.loads(input_data)
+    input_model = {input_model_name}(**input_dict)
+    
+    result = deps.{dep_name}.{method_name}(input_model)
     # Convert Pydantic model to dict for LangChain compatibility
     return result.model_dump()
 '''
@@ -191,17 +211,40 @@ def register_generated_tools(registry):
         f.write(content)
 
 
-def _get_python_type(yaml_type: str) -> str:
-    """Convert YAML type to Python type annotation"""
+def load_schema(schema_name: str) -> Dict[str, Any]:
+    """Load a schema file by name"""
+    try:
+        schema_file = Path(__file__).parent.parent.parent / 'specs' / 'schemas' / f'{schema_name}.schema.yaml'
+        if not schema_file.exists():
+            print(f"⚠️  Schema file not found: {schema_file}")
+            return None
+            
+        with open(schema_file, 'r') as f:
+            schema = yaml.safe_load(f)
+            if not schema or 'properties' not in schema:
+                print(f"⚠️  Invalid schema file {schema_name}: missing properties")
+                return None
+            return schema
+    except Exception as e:
+        print(f"❌ Error loading schema {schema_name}: {e}")
+        return None
+
+
+def _get_python_type_from_schema(param_spec: Dict[str, Any]) -> str:
+    """Convert JSON Schema type to Python type annotation"""
+    schema_type = param_spec.get('type', 'string')
     type_mapping = {
-        "str": "str",
-        "int": "int",
-        "float": "float",
-        "bool": "bool",
-        "list": "list",
-        "dict": "dict"
+        'string': 'str',
+        'integer': 'int',
+        'number': 'float',
+        'boolean': 'bool',
+        'array': 'list',
+        'object': 'dict',
     }
-    return type_mapping.get(yaml_type, "Any")
+    return type_mapping.get(schema_type, 'Any')
+
+
+
 
 
 if __name__ == "__main__":

@@ -1,0 +1,15 @@
+title: "CardListInput"
+type: "object"
+properties:
+  deck:
+    type: "string"
+    description: "Name of the deck to retrieve cards from"
+    minLength: 1
+  limit:
+    type: "integer"
+    description: "Maximum number of cards to return"
+    minimum: 1
+    maximum: 100
+required:
+  - deck
+  - limit

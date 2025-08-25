@@ -41,7 +41,7 @@ class AgentBuilder:
 
     def _create_react_agent(self, llm: ChatOpenAI, prompt: ChatPromptTemplate, tools: list) -> AgentExecutor:
         agent = create_react_agent(llm, tools, prompt)
-        return AgentExecutor(agent=agent, tools=tools, verbose=False, handle_parsing_errors=True)
+        return AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
     
     def _build_system_rules(self) -> str:
         # Business logic: invariant text generation

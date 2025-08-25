@@ -18,6 +18,13 @@ class CardList(BaseModel):
     deck: str
     cards: List['Card']
 
+class CardListInput(BaseModel):
+    deck: str
+    limit: int
+
+class DeckListInput(BaseModel):
+    limit: int
+
 class Deck(BaseModel):
     name: str
     note_count: int
