@@ -2,6 +2,8 @@
 
 A conversational AI assistant that helps you browse and explore your Anki flashcards through natural language chat.
 
+> This repo is the companion case study to [From AI Coding Chaos to Clean Code: A Spec-First Case Study](https://www.linkedin.com/pulse/from-ai-coding-chaos-clean-code-spec-first-case-study-lunochkin-txgcf/). The architecture is deliberately heavier than the app needs — the project exists to demonstrate spec-first development with AI coding tools (specs → generated tools → invariant validation), using a small Anki assistant as the test subject.
+
 ## What It Does
 
 The Anki LLM Assistant lets you interact with your Anki collection using plain English. Instead of navigating through menus and clicking buttons, you can simply ask questions like:
