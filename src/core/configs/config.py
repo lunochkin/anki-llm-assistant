@@ -30,7 +30,12 @@ class RuntimeConfig:
 @dataclass(frozen=True)
 class AdapterConfig:
     """Adapter configuration for external services"""
-    anki: str  # "anki_connect" or "mock"
+    anki_url: str  # URL for AnkiConnect API
+    
+    @property
+    def anki_mode(self) -> str:
+        """Get Anki mode from environment variable"""
+        return os.getenv("ANKI_MODE", "mock")
 
 
 @dataclass(frozen=True)
@@ -98,13 +103,22 @@ class ConfigLoader:
         """Load adapter configuration from implementation.yaml"""
         impl_path = self.specs_dir / "implementation.yaml"
         
+        if not impl_path.exists():
+            raise FileNotFoundError(f"Implementation config not found: {impl_path}")
+        
         with open(impl_path, 'r') as f:
             data = yaml.safe_load(f)
         
         adapters_data = data.get("adapters", {})
         
+        # Load anki_url from YAML
+        anki_url = adapters_data.get("anki_url")
+        
+        if anki_url is None:
+            raise ValueError("Missing required 'anki_url' configuration in implementation.yaml")
+        
         return AdapterConfig(
-            anki=adapters_data.get("anki", "anki_connect")
+            anki_url=anki_url
         )
     
     def _load_invariants_config(self) -> InvariantsConfig:
@@ -138,24 +152,3 @@ def load_config(specs_dir: str = "specs") -> Config:
     """Convenience function to load configuration"""
     loader = ConfigLoader(specs_dir)
     return loader.load_config()
-
-
-def get_default_config() -> Config:
-    """Get configuration with default specs directory"""
-    return load_config()
-
-
-# Environment-specific configuration helpers
-def is_development() -> bool:
-    """Check if running in development mode"""
-    return os.getenv("ENVIRONMENT", "development").lower() == "development"
-
-
-def is_testing() -> bool:
-    """Check if running in testing mode"""
-    return os.getenv("ENVIRONMENT", "development").lower() == "testing"
-
-
-def should_use_mock_anki() -> bool:
-    """Check if should use mock Anki adapter"""
-    return is_testing() or os.getenv("USE_MOCK_ANKI", "false").lower() == "true"

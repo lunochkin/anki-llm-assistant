@@ -7,5 +7,8 @@
     {"id": 3, "question": "Question 3", "answer": "Answer 3", "deck": "French::A1"},
     {"id": 4, "question": "Question 4", "answer": "Answer 4", "deck": "French::A1"},
     {"id": 5, "question": "Question 5", "answer": "Answer 5", "deck": "French::A1"}
-  ]
+  ],
+  "total_count": 49,
+  "limit_applied": 5,
+  "has_more": true
 }

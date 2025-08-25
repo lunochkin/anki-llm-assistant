@@ -2,6 +2,8 @@
   "kind": "deck_list",
   "decks": [
     {"name": "French::A1", "note_count": 312, "card_count": 0},
-    {"name": "EVP C1/C2", "note_count": 10452, "card_count": 0}
+    {"name": "EVP C1/C2", "note_count": 10452, "card_count": 0},
+    {"name": "Default", "note_count": 0, "card_count": 0},
+    {"name": "English Personal", "note_count": 394, "card_count": 0}
   ]
 }
