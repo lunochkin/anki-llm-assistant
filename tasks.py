@@ -7,9 +7,14 @@ def test_golden(ctx):
     ctx.run(f"python -m pytest tests/test_golden.py -v -s")
 
 @task
-def cli_query(ctx):
+def cli_query_decks(ctx):
     """Run the CLI with a query"""
     ctx.run(f"python -m src.app.cli --query 'My decks'")
+
+@task
+def cli_query_cards(ctx):
+    """Run the CLI with a query"""
+    ctx.run(f"python -m src.app.cli --query 'Show me 5 cards from French::A1 deck'")
 
 @task
 def generate_models(ctx):

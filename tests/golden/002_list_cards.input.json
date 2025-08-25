@@ -1,0 +1,5 @@
+{
+  "turns": [
+    {"role": "user", "text": "Show me 5 cards from French::A1 deck"}
+  ]
+}

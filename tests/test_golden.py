@@ -8,7 +8,8 @@ from src.core.dependencies import get_dependency_container
 load_dotenv()
 
 FIXTURES = [
-    "001_list_decks"
+    "001_list_decks",
+    "002_list_cards"
 ]
 
 def read_json(path: pathlib.Path):
@@ -37,6 +38,7 @@ def test_golden():
         # Compare actual output with expected output
         diff = DeepDiff(agent_output, expected)
         if diff:
+            print(diff)
             # If outputs don't match, raise an error to fail the test
             raise AssertionError(f"Output mismatch for {name}")
         
@@ -45,11 +47,13 @@ def test_golden():
         # Test the individual tools using new architecture
         deps = get_dependency_container()
         if "decks" in user_input.lower():
-            deck_result = deps.decks_tool.list_decks(10)
+            from src.core.contracts import DeckListInput
+            deck_result = deps.decks_tool.list_decks(DeckListInput(limit=10))
             assert "decks" in deck_result.model_dump()
             assert len(deck_result.decks) <= 10
         elif "cards" in user_input.lower():
-            card_result = deps.cards_tool.list_cards("French::A1", 5)
+            from src.core.contracts import CardListInput
+            card_result = deps.cards_tool.list_cards(CardListInput(deck="French::A1", limit=5))
             assert "cards" in card_result.model_dump()
             assert len(card_result.cards) <= 5
             assert card_result.deck == "French::A1"

@@ -9,7 +9,9 @@ from src.core.generated.models import (
     Deck,
     DeckList,
     Card,
-    CardList
+    CardList,
+    CardListInput,
+    DeckListInput
 )
 from src.core.validators.reply_validator import validate_reply
 
@@ -18,5 +20,7 @@ __all__ = [
     "DeckList", 
     "Card",
     "CardList",
+    "CardListInput",
+    "DeckListInput",
     "validate_reply"
 ]
