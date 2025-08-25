@@ -1,0 +1,63 @@
+# CLI Interface Specification
+# Tier-1: Defines how users interact with the system via command line
+
+cli_version: 1.0.0
+title: Anki LLM Assistant CLI
+description: Command-line interface for Anki LLM Assistant
+
+# CLI Commands Structure
+commands:
+  # Public Commands (for end users)
+  public:
+    chat:
+      description: "Start interactive chat with Anki LLM Assistant"
+      usage: "cli.py chat [options]"
+      arguments:
+        - name: --temperature
+          type: float
+          default: 0.0
+          description: "Temperature for responses (default: 0.0)"
+
+  # Development and Testing Commands
+  dev_test:
+    test:
+      description: "[DEV] Run test queries against the system"
+      usage: "cli.py test [options]"
+      arguments: []
+
+    test-service:
+      description: "[DEV] Test Anki service directly"
+      usage: "cli.py test-service [options]"
+      arguments: []
+
+# Global CLI Options
+global_options:
+  - name: --model
+    type: string
+    default: "gpt-4o-mini"
+    description: "LLM model to use for operations"
+  - name: --mode
+    type: string
+    choices: ["mock", "anki_connect"]
+    description: "Override Anki mode (uses ANKI_MODE env var if not specified)"
+  - name: --version
+    type: boolean
+    description: "Show version information and exit"
+  - name: --config
+    type: string
+    description: "Path to configuration file"
+
+# Environment Variables
+environment_variables:
+  ANKI_MODE:
+    description: "Default mode for Anki operations"
+    default: "anki_connect"
+    choices: ["mock", "anki_connect"]
+  OPENAI_API_KEY:
+    description: "OpenAI API key for LLM operations"
+    required: true
+  ANKI_CONNECT_URL:
+    description: "AnkiConnect server URL"
+    default: "http://localhost:8765"
+
+
