@@ -22,10 +22,10 @@ class CardsTool:
         # Business logic: validate input
         validated_limit = self.validator.validate_deck_limit(request.limit)
         # Business logic: get data
-        cards = self.anki_service.get_cards(request.deck, validated_limit)
+        card_list = self.anki_service.get_cards(request.deck, validated_limit)
         
         # Business logic: check invariants
-        self.invariant_checker.ensure_card_limit(cards)
+        self.invariant_checker.ensure_card_limit(card_list.cards)
         
-        # Business logic: format response
-        return self.response_formatter.format_card_list(request.deck, cards)
+        # Return the CardList directly (already properly formatted)
+        return card_list

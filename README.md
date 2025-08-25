@@ -76,6 +76,68 @@ This project follows a **spec-first development approach** with a **tiered archi
 - **No hidden logic**: Tier-3 is generated from Tier-2, which implements Tier-1
 - **Executable specs**: Configuration files drive system behavior
 
+## Anki Service Modes
+
+The assistant supports two modes for accessing Anki data:
+
+### Mock Mode (Default)
+- **Purpose**: Development, testing, and demonstration
+- **Data**: Hardcoded sample decks and cards
+- **Configuration**: Set `anki: mock` in `specs/implementation.yaml`
+- **Use case**: When you don't have Anki running or want to test the interface
+
+### AnkiConnect Mode
+- **Purpose**: Real Anki data access
+- **Data**: Live data from your Anki collection
+- **Requirements**: 
+  - Anki running with AnkiConnect add-on installed
+  - AnkiConnect enabled and accessible at `http://127.0.0.1:8765`
+- **Configuration**: Set `anki: anki_connect` in `specs/implementation.yaml`
+- **Use case**: Production use with real Anki data
+
+### Switching Between Modes
+
+The system automatically supports both mock and real Anki services. You can switch between them using environment variables or CLI parameters:
+
+#### Environment Variable Control
+```bash
+# Use mock service (default)
+export ANKI_MODE=mock
+
+# Use real AnkiConnect service
+export ANKI_MODE=anki_connect
+
+# Test the service
+python -m src.app.cli test-service
+```
+
+#### CLI Override
+```bash
+# Override to mock mode
+python -m src.app.cli test-service --mode mock
+
+# Override to AnkiConnect mode
+python -m src.app.cli test-service --mode anki_connect
+```
+
+#### Configuration
+The `specs/implementation.yaml` only contains the Anki URL - the mode is controlled at runtime:
+```yaml
+adapters:
+  anki_url: http://127.0.0.1:8765  # AnkiConnect API endpoint
+```
+
+**Note**: No code regeneration is needed to switch between modes. The system automatically detects and uses the appropriate service based on your environment configuration.
+
+#### Running the Assistant
+```bash
+# Interactive chat
+python -m src.app.cli chat
+
+# Test queries
+python -m src.app.cli test
+```
+
 ## Development
 
 For developers interested in contributing or understanding the system architecture:

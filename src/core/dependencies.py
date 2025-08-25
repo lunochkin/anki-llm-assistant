@@ -6,7 +6,7 @@ ensuring proper initialization and dependency injection.
 """
 
 from src.core.configs.config import load_config
-from src.core.services.anki_service import AnkiService
+from src.core.services.anki_service import MockAnkiService, AnkiConnectService
 from src.core.validators.input_validator import InputValidator
 from src.core.validators.invariant_checker import InvariantChecker
 from src.core.services.response_formatter import ResponseFormatter
@@ -26,12 +26,17 @@ class DependencyContainer:
     
     def _create_services(self):
         """Create all service instances"""
-        if self.config.adapters.anki == "anki_connect":
-            raise NotImplementedError("Anki Connect is not implemented yet")
-        elif self.config.adapters.anki == "mock":
-            self.anki_service = AnkiService()
+        # Get mode from config (environment variable controlled)
+        anki_mode = self.config.adapters.anki_mode
+        
+        if anki_mode == "anki_connect":
+            # Use real AnkiConnect service
+            self.anki_service = AnkiConnectService(anki_url=self.config.adapters.anki_url)
+        elif anki_mode == "mock":
+            # Use mock service for testing/development
+            self.anki_service = MockAnkiService()
         else:
-            raise ValueError(f"Invalid Anki runtime: {self.config.adapters.anki}")
+            raise ValueError(f"Invalid Anki mode: {anki_mode}. Use 'mock' or 'anki_connect'")
 
         self.response_formatter = ResponseFormatter()
     
@@ -42,34 +47,29 @@ class DependencyContainer:
     
     def _create_tools(self):
         """Create all tool instances with proper dependencies"""
+        # Create validators first
         self._create_validators()
         
+        # Create tools with dependencies
         self.decks_tool = DecksTool(
             anki_service=self.anki_service,
             validator=self.input_validator,
             invariant_checker=self.invariant_checker,
-            response_formatter=self.response_formatter
+            response_formatter=self.response_formatter,
         )
         
         self.cards_tool = CardsTool(
             anki_service=self.anki_service,
             validator=self.input_validator,
             invariant_checker=self.invariant_checker,
-            response_formatter=self.response_formatter
+            response_formatter=self.response_formatter,
         )
     
     def _create_tool_registry(self):
         """Create and populate the tool registry"""
         self.tool_registry = ToolRegistry()
-        # Tool registry will be populated by register_all_tools() call
-    
-    def get_tool_registry(self) -> ToolRegistry:
-        """Get the populated tool registry"""
-        return self.tool_registry
-    
-    def get_config(self):
-        """Get the configuration"""
-        return self.config
+        self.tool_registry.register_tool("anki_list_decks", self.decks_tool.list_decks)
+        self.tool_registry.register_tool("anki_list_cards", self.cards_tool.list_cards)
 
 
 # Global dependency container instance
@@ -77,7 +77,7 @@ _dependency_container = None
 
 
 def get_dependency_container() -> DependencyContainer:
-    """Get the global dependency container instance"""
+    """Get or create the global dependency container"""
     global _dependency_container
     if _dependency_container is None:
         _dependency_container = DependencyContainer()

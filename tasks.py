@@ -12,9 +12,14 @@ def cli_query_decks(ctx):
     ctx.run(f"python -m src.app.cli --query 'My decks'")
 
 @task
-def cli_query_cards(ctx):
+def cli_test_mock(ctx):
     """Run the CLI with a query"""
-    ctx.run(f"python -m src.app.cli --query 'Show me 5 cards from French::A1 deck'")
+    ctx.run(f"python -m src.app.cli test --mode mock")
+
+@task
+def cli_test_anki_connect(ctx):
+    """Run the CLI with a query"""
+    ctx.run(f"python -m src.app.cli test --mode anki_connect")
 
 @task
 def generate_models(ctx):

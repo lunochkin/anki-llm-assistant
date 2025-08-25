@@ -12,5 +12,16 @@ properties:
     type: array
     items:
       $ref: "card.schema.yaml"
-    description: "List of cards"
-required: ["kind", "deck", "cards"]
+    description: "List of cards returned (limited subset)"
+  total_count:
+    type: integer
+    minimum: 0
+    description: "Total number of cards available in the deck"
+  limit_applied:
+    type: integer
+    minimum: 0
+    description: "Number of cards actually returned (may be less than requested limit)"
+  has_more:
+    type: boolean
+    description: "Whether there are more cards available beyond the returned subset"
+required: ["kind", "deck", "cards", "total_count", "limit_applied", "has_more"]

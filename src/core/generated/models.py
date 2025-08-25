@@ -17,6 +17,9 @@ class CardList(BaseModel):
     kind: Literal['card_list']
     deck: str
     cards: List['Card']
+    total_count: int
+    limit_applied: int
+    has_more: bool
 
 class CardListInput(BaseModel):
     deck: str
