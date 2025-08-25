@@ -2,59 +2,34 @@
 Tier-3 command-line interface for Anki LLM Assistant.
 
 This module provides CLI commands for testing and using the assistant.
+The CLI structure is driven by specs/cli.yaml specification.
 """
 
-import argparse
 from src.app.agent_factory_gen import create_anki_agent
+from src.app.cli_parser import load_cli_spec, build_parser_from_spec
 
 
 def main():
     """Main CLI entry point"""
-    parser = argparse.ArgumentParser(
-        description="Anki LLM Assistant - Chat with your Anki collection"
-    )
-    
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
-    
-    # Chat command
-    chat_parser = subparsers.add_parser("chat", help="Start interactive chat")
-    chat_parser.add_argument(
-        "--model", 
-        default="gpt-4o-mini", 
-        help="Model to use (default: gpt-4o-mini)"
-    )
-    chat_parser.add_argument(
-        "--temperature", 
-        type=float, 
-        default=0.0, 
-        help="Temperature for responses (default: 0.0)"
-    )
-    
-    # Test command
-    test_parser = subparsers.add_parser("test", help="Run test queries")
-    test_parser.add_argument(
-        "--model", 
-        default="gpt-4o-mini", 
-        help="Model to use (default: gpt-4o-mini)"
-    )
-    test_parser.add_argument(
-        "--mode", 
-        choices=["mock", "anki_connect"], 
-        help="Override Anki mode (uses ANKI_MODE env var if not specified)"
-    )
-    
-    # Service test command
-    service_parser = subparsers.add_parser("test-service", help="Test Anki service directly")
-    service_parser.add_argument(
-        "--mode", 
-        choices=["mock", "anki_connect"], 
-        help="Override Anki mode (uses ANKI_MODE env var if not specified)"
-    )
+    # Load CLI specification and build parser
+    spec = load_cli_spec()
+    parser = build_parser_from_spec(spec)
     
     args = parser.parse_args()
     
+    # Handle version flag
+    if hasattr(args, 'version') and args.version:
+        print(f"Anki LLM Assistant {spec['cli_version']}")
+        return
+    
+    # Handle config flag
+    if hasattr(args, 'config') and args.config:
+        print(f"Config file: {args.config}")
+        # TODO: Implement config file loading
+        return
+    
     if args.command == "chat":
-        run_chat(args.model, args.temperature)
+        run_chat(args.model, args.temperature, args.mode)
     elif args.command == "test":
         run_test_queries(args.model, args.mode)
     elif args.command == "test-service":
@@ -63,9 +38,15 @@ def main():
         parser.print_help()
 
 
-def run_chat(model_name: str, temperature: float):
+def run_chat(model_name: str, temperature: float, mode: str = None):
     """Run interactive chat mode"""
     print(f"Initializing Anki LLM Assistant with {model_name}...")
+    
+    # Override mode if specified via CLI
+    if mode:
+        import os
+        os.environ["ANKI_MODE"] = mode
+        print(f"Using Anki mode: {mode}")
     
     try:
         agent = create_anki_agent(
@@ -100,6 +81,12 @@ def run_chat(model_name: str, temperature: float):
                 
     except Exception as e:
         print(f"Failed to initialize agent: {e}")
+    finally:
+        # Clean up environment variable if we set it
+        if mode:
+            import os
+            if "ANKI_MODE" in os.environ:
+                del os.environ["ANKI_MODE"]
 
 
 def run_test_queries(model_name: str, mode: str = None):
@@ -136,6 +123,12 @@ def run_test_queries(model_name: str, mode: str = None):
                 
     except Exception as e:
         print(f"Failed to initialize agent: {e}")
+    finally:
+        # Clean up environment variable if we set it
+        if mode:
+            import os
+            if "ANKI_MODE" in os.environ:
+                del os.environ["ANKI_MODE"]
 
 
 def test_anki_service(mode: str = None):
@@ -167,8 +160,8 @@ def test_anki_service(mode: str = None):
             first_deck = decks[0].name
             print(f"\nTesting get_cards for '{first_deck}'...")
             cards = deps.anki_service.get_cards(first_deck, limit=2)
-            print(f"Found {len(cards)} cards:")
-            for card in cards:
+            print(f"Found {len(cards.cards)} cards:")
+            for card in cards.cards:
                 print(f"  - Card {card.id}: {card.question[:50]}...")
         
         print("\n✅ Service test completed successfully!")
